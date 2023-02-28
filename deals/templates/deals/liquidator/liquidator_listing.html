@@ -1,0 +1,119 @@
+
+<a onclick="addFormAjax()" class="btn btn-primary pull-right">Add Liquidator</a>
+
+{% if liquidator_list %}
+<div class="w-20 pull-right" style="padding:0 2px;margin:0 4px;">
+  <div class="w-20 pull-right" style="padding:0 2px;margin:0 4px;">
+    <select class="form-control" id="selectLiquidator2">
+      <option value="all" selected>Show All </option> 
+      <option value="active">Show Active</option>
+      <option value="inactive">Show Inactive</option>
+    </select>
+  </div>
+</div>
+<table id="table" class="table table-striped">
+      <thead>
+        <tr>
+          <th>Select</th>
+          <th>Contact Name</th>
+          <th>Company</th>
+          <th>Postal Address</th>
+          <th>Mobile</th>
+          <th>Email</th>
+          <th>Edit</th>
+          <th>Delete</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for liquidator in liquidator_list %}
+        <tr class="status-{{liquidator.select}}"> 
+        {% if liquidator.select == True %}
+        <td><input type="checkbox" onclick="change_s_status(this, false)" value="{{liquidator.id}}" checked></td>
+        {% else %}
+        <td><input type="checkbox" onclick="change_s_status(this, true)" value="{{liquidator.id}}"></td>
+        {% endif %} 
+            <td>{{liquidator.name}}</td>
+            <td>{{liquidator.company}}</td>
+            <td>{{liquidator.address}}</td>
+            <td>{{liquidator.phone}}</td>
+            <td>{{liquidator.email}}</td>
+
+            <td><a onclick="editLiquidator(this)" title="{% url 'dashboard:deals:liquidator_edit' liquidator.id %}" class="btn btn-info btn-xs">
+                <i class="fa fa-pencil"></i> Edit</a></td>
+            <td><a onclick="deleteLiquidator(this)" title="{% url 'dashboard:deals:liquidator_delete' liquidator.id %}"
+                   class="btn btn-danger btn-xs ve-sh-del-contact">
+                <i class="fa fa-trash-o"></i> Delete</a></td>
+        </tr>
+        {%endfor%}
+      </tbody>
+</table>
+
+{% else %}
+  <div class="p-4">
+    No Liquidator Found !
+</div>
+{% endif%}
+
+<script>
+ 
+  $('#selectLiquidator2').on('change', function (e) {
+    if(this.value == 'all'){
+      $('.status-True').css('display','table-row');
+      $('.status-False').css('display','table-row');
+    }else if(this.value == 'active'){
+      $('.status-True').css('display','table-row');
+      $('.status-False').css('display','none');
+    }else {
+      $('.status-True').css('display','none');
+      $('.status-False').css('display','table-row');
+    }
+    //loadagent(this.value);
+  });
+  function change_s_status(x,y) {
+    var d = ''.concat(x.value).concat(';').concat(y)
+    var saveData = $.ajax({
+      type: 'POST',
+      url: "liquidatorchangestatus/",
+      data: d,
+      headers: {"X-CSRFToken": '{{csrf_token}}'},
+      dataType: "text",
+      success: function(resultData) { loadLiquidator(); }
+    });
+    
+  }
+</script>
+
+<script>
+
+    $('#selectLiquidator').on('change', function (e) {
+        loadLiquidator(this.value);
+    });
+</script>
+
+
+
+<script>
+    function addFormAjax(){
+    $('#myModal').modal('show');
+    urlPATH="{% url 'dashboard:deals:liquidator_create' %}";
+    $('.modal-body').load(urlPATH);
+
+    }
+
+    function editLiquidator(tag){
+    $('#myModal').modal('show');
+    urlPATH=tag.title;
+    console.log(urlPATH);
+    $('.modal-body').load(urlPATH);
+    }
+
+    function deleteLiquidator(tag){
+    $('#myModal').modal('show');
+    urlPATH=tag.title;
+    console.log(urlPATH);
+    $('.modal-body').load(urlPATH);
+    }
+
+</script>
+
+

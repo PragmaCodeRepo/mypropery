@@ -1,0 +1,120 @@
+<a onclick="addFormAjax()" class="btn btn-primary pull-right">Add Executor</a>
+
+{% if executor_list %}
+<div class="w-20 pull-right" style="padding:0 2px;margin:0 4px;">
+  <div class="w-20 pull-right" style="padding:0 2px;margin:0 4px;">
+    <select class="form-control" id="selectExecutor2">
+      <option value="all" selected>Show All </option>  
+      <option value="active">Show Active</option>
+      <option value="inactive">Show Inactive</option>
+    </select>
+  </div>
+</div>
+<table id="table" class="table table-striped">
+  <thead>
+    <tr>
+      <th>Select</th>
+      <th>Name</th>
+      <th>Company</th>
+      <th>Postal Address</th>
+      <th>Mobile</th>
+      <th>Email</th>
+      <th>Edit</th>
+      <th>Delete</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for executor in executor_list %}
+    <tr class="status-{{executor.select}}"> 
+      {% if executor.select == True %}
+      <td><input type="checkbox" onclick="change_s_status(this, false)" value="{{executor.id}}" checked></td>
+      {% else %}
+      <td><input type="checkbox" onclick="change_s_status(this, true)" value="{{executor.id}}"></td>
+      {% endif %}
+    
+        <td>{{executor.name}}</td>
+        <td>{{executor.company}}</td>
+        <td>{{executor.address}}</td>
+        <td>{{executor.phone}}</td>
+        <td>{{executor.email}}</td>
+
+        <td><a onclick="editExecutor(this)" title="{% url 'dashboard:deals:executor_edit' executor.id %}"
+            class="btn btn-info btn-xs">
+            <i class="fa fa-pencil"></i> Edit</a></td>
+        <td><a onclick="deleteExecutor(this)" title="{% url 'dashboard:deals:executor_delete' executor.id %}"
+            class="btn btn-danger btn-xs ve-sh-del-contact">
+          <i class="fa fa-trash-o"></i> Delete</a></td>
+    </tr>
+  {%endfor%}
+  </tbody>
+</table>
+
+
+{% else %}
+<div class="p-4">
+  No Excutor Found !
+</div>
+{% endif%}
+
+
+<script>
+  
+  $('#selectExecutor2').on('change', function (e) {
+    if(this.value == 'all'){
+      $('.status-True').css('display','table-row');
+      $('.status-False').css('display','table-row');
+    }else if(this.value == 'active'){
+      $('.status-True').css('display','table-row');
+      $('.status-False').css('display','none');
+    }else {
+      $('.status-True').css('display','none');
+      $('.status-False').css('display','table-row');
+    }
+    //loadagent(this.value);
+  });
+  function change_s_status(x,y) {
+    var d = ''.concat(x.value).concat(';').concat(y)
+    var saveData = $.ajax({
+      type: 'POST',
+      url: "executorchangestatus/",
+      data: d,
+      headers: {"X-CSRFToken": '{{csrf_token}}'},
+      dataType: "text",
+      success: function(resultData) { loadExecutor(); }
+    });
+    
+  }
+</script>
+
+<script>
+
+  $('#selectExecutor').on('change', function (e) {
+    loadExecutor(this.value);
+  });
+</script>
+
+
+
+<script>
+  function addFormAjax() {
+    $('#myModal').modal('show');
+    urlPATH = "{% url 'dashboard:deals:executor_create' %}";
+    $('.modal-body').load(urlPATH);
+
+  }
+
+  function editExecutor(tag) {
+    $('#myModal').modal('show');
+    urlPATH = tag.title;
+    console.log(urlPATH);
+    $('.modal-body').load(urlPATH);
+  }
+
+  function deleteExecutor(tag) {
+    $('#myModal').modal('show');
+    urlPATH = tag.title;
+    console.log(urlPATH);
+    $('.modal-body').load(urlPATH);
+  }
+
+</script>
